@@ -1,0 +1,418 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}마이페이지 | LocalEats{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* =========================
+    ✅ 마이페이지에서만 "전체 배경 어둡게"
+     ========================= */
+  body{
+    background: #2b211c !important;   /* 목표처럼 흰색 제거 핵심 */
+  }
+
+  /* 배경 먼지/비네팅(목표 느낌) */
+  body::before{
+    content:"";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(1200px 700px at 50% 35%, rgba(0,0,0,.15), rgba(0,0,0,.78)),
+      radial-gradient(circle at 10% 20%, rgba(255,255,255,.06) 0 1px, rgba(0,0,0,0) 2px) 0 0/10px 10px;
+    opacity: .45;
+    z-index: 0;
+  }
+
+  :root{
+    --accent: #b96b3a;      /* 목표 주황 */
+    --accent2:#a85f33;
+    --line: rgba(255,255,255,.10);
+    --txt: rgba(255,255,255,.92);
+    --sub: rgba(255,255,255,.70);
+    --card: rgba(0,0,0,.24);
+  }
+
+  /* navbar 아래 영역 전체 폭 사용 */
+  .mypage-wrap{
+    position: relative;
+    z-index: 1;
+    padding: 26px 0 70px;
+  }
+
+  .mypage-container{
+    max-width: 1250px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .mypage-grid{
+    display: grid;
+    grid-template-columns: 290px 1fr;
+    gap: 22px;
+    align-items: start;
+  }
+
+  /* =========================
+    LEFT SIDEBAR (목표 느낌)
+     ========================= */
+  .side{
+    border-radius: 18px;
+    overflow: hidden;
+    background:
+      radial-gradient(700px 420px at 30% 0%, rgba(255,220,150,.10), rgba(0,0,0,0)),
+      linear-gradient(180deg, rgba(40,31,26,.98), rgba(12,10,9,.99));
+    box-shadow: 0 12px 50px rgba(0,0,0,.25);
+    min-height: 670px;
+    color: var(--txt);
+    position: relative;
+  }
+
+  .side::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    background:
+      radial-gradient(1200px 700px at 50% 40%, rgba(0,0,0,.10), rgba(0,0,0,.78)),
+      radial-gradient(circle at 10% 20%, rgba(255,255,255,.06) 0 1px, rgba(0,0,0,0) 2px) 0 0/10px 10px;
+    opacity:.35;
+  }
+
+  .side-inner{ position:relative; z-index:1; padding: 18px; }
+  .user-row{ display:flex; gap:12px; align-items:center; margin-bottom: 14px; }
+  .avatar{
+    width: 44px; height: 44px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.08);
+    border: 2px solid rgba(255,255,255,.18);
+    display:flex; align-items:center; justify-content:center;
+    overflow:hidden;
+  }
+  .avatar img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .uname{ font-weight: 950; font-size: 16px; line-height:1.1; }
+  .uemail{ font-size: 12px; opacity:.7; margin-top:6px; }
+
+  .side-nav{ margin-top: 18px; display:flex; flex-direction:column; gap:10px; }
+  .side-link{
+    display:flex; align-items:center; gap:12px;
+    padding: 14px 14px;
+    border-radius: 14px;
+    color: rgba(255,255,255,.86);
+    font-weight: 950;
+    text-decoration:none;
+    transition: .12s ease;
+  }
+  .side-link:hover{ background: rgba(255,255,255,.06); }
+  .dot{ width:10px; height:10px; border-radius:999px; background: rgba(255,255,255,.28); }
+  .side-link.active{
+    background: var(--accent);
+    color:#fff;
+  }
+  .side-link.active .dot{ background:#fff; }
+
+  /* =========================
+    RIGHT MAIN (목표 느낌)
+     ========================= */
+  .main{
+    border-radius: 18px;
+    overflow:hidden;
+    background:
+      repeating-linear-gradient(135deg,
+        rgba(255,255,255,.04) 0 2px,
+        rgba(0,0,0,0) 2px 24px),
+      radial-gradient(900px 520px at 55% 0%,
+        rgba(255, 200, 120, .14),
+        rgba(0,0,0,0) 60%),
+      linear-gradient(180deg, rgba(38,30,26,.98), rgba(14,11,10,.99));
+    box-shadow: 0 12px 50px rgba(0,0,0,.28);
+    min-height: 670px;
+    position: relative;
+    color: var(--txt);
+  }
+
+  /* 비네팅/먼지 */
+  .main::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    background:
+      radial-gradient(1400px 900px at 50% 40%, rgba(0,0,0,.10), rgba(0,0,0,.78)),
+      radial-gradient(circle at 10% 20%, rgba(255,255,255,.065) 0 1px, rgba(0,0,0,0) 2px) 0 0/10px 10px;
+    opacity:.40;
+  }
+
+  .main-inner{ position:relative; z-index:1; padding: 30px; }
+
+  .title{
+    font-size: 44px;
+    font-weight: 1000;
+    letter-spacing: -1px;
+    margin: 0 0 10px;
+  }
+  .hello{
+    color: var(--sub);
+    line-height: 1.7;
+    margin: 0 0 18px;
+  }
+
+  /* 탭(예약목록/방문한맛집) */
+  .tabs{ display:flex; gap: 10px; margin-bottom: 18px; }
+  .tab{
+    padding: 10px 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,.18);
+    background: rgba(0,0,0,.22);
+    color: rgba(255,255,255,.9);
+    font-weight: 950;
+    cursor:pointer;
+  }
+  .tab.active{
+    background: var(--accent);
+    border-color: var(--accent);
+    color:#fff;
+  }
+
+  /* 안쪽 패널(목표의 큰 박스) */
+  .panel{
+    border-radius: 18px;
+    border: 1px solid var(--line);
+    background: rgba(0,0,0,.22);
+    padding: 18px;
+  }
+
+  /* 예약 리스트(2줄) */
+  .r-item{
+    display:flex;
+    align-items:center;
+    gap: 16px;
+    padding: 18px;
+    border-radius: 18px;
+    border: 1px solid rgba(255,255,255,.12);
+    background: rgba(0,0,0,.26);
+  }
+  .r-item + .r-item{ margin-top: 16px; }
+
+  .thumb{
+    width: 160px;
+    height: 86px;
+    border-radius: 16px;
+    overflow:hidden;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.12);
+  }
+  .thumb img{ width:100%; height:100%; object-fit:cover; display:block; opacity:.95; }
+
+  .r-title{
+    font-size: 20px;
+    font-weight: 1000;
+    margin: 0;
+  }
+  .r-meta{
+    margin-top: 6px;
+    color: var(--sub);
+    font-size: 14px;
+  }
+
+  .r-btn{
+    margin-left:auto;
+    padding: 12px 18px;
+    border-radius: 14px;
+    background: var(--accent);
+    color:#fff;
+    font-weight: 1000;
+    text-decoration:none;
+    white-space: nowrap;
+  }
+  .r-btn:hover{ background: var(--accent2); }
+
+  /* 방문한 맛집 섹션 */
+  .section{
+    margin-top: 22px;
+    font-weight: 1000;
+    opacity:.95;
+  }
+
+  .v-grid{
+    margin-top: 14px;
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .v-card{
+    border-radius: 18px;
+    overflow:hidden;
+    border: 1px solid rgba(255,255,255,.12);
+    background: rgba(0,0,0,.26);
+  }
+  .v-img{
+    height: 160px;
+    background: rgba(255,255,255,.06);
+  }
+  .v-img img{ width:100%; height:100%; object-fit:cover; display:block; opacity:.95; }
+
+  .v-body{ padding: 14px 14px 16px; }
+  .v-title{ margin:0 0 6px; font-size:18px; font-weight:1000; }
+  .v-date{ color: var(--sub); font-size:14px; margin-bottom: 10px; }
+
+  .stars{
+    display:flex; align-items:center; gap: 10px;
+    color: #d8b56b;
+    font-weight: 1000;
+  }
+  .stars small{ color: rgba(255,255,255,.55); font-weight:900; }
+
+  @media (max-width: 980px){
+    .mypage-grid{ grid-template-columns: 1fr; }
+    .v-grid{ grid-template-columns: 1fr; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mypage-wrap">
+  <div class="mypage-container">
+    <div class="mypage-grid">
+
+      <!-- LEFT -->
+      <aside class="side">
+        <div class="side-inner">
+          <div class="user-row">
+            <div class="avatar">
+              <img src="{% static 'images/mypage/profile.png' %}" alt="profile">
+            </div>
+            <div>
+              <div class="uname">{{ user.username }}</div>
+              <div class="uemail">admin@example.com</div>
+            </div>
+          </div>
+
+          <div class="side-nav">
+            <a class="side-link active" href="#top" onclick="return go('top','mypage')">
+              <span class="dot"></span> 마이페이지
+            </a>
+            <a class="side-link" href="#reserve" onclick="return go('reserve','reserve')">
+              <span class="dot"></span> 예약 목록
+            </a>
+            <a class="side-link" href="#visit" onclick="return go('visit','visit')">
+              <span class="dot"></span> 방문한 맛집
+            </a>
+          </div>
+        </div>
+      </aside>
+
+      <!-- RIGHT -->
+      <main class="main" id="top">
+        <div class="main-inner">
+
+          <div class="title">마이페이지</div>
+          <p class="hello">
+            안녕하세요, <b>{{ user.username }}</b>님! 예약하신 맛집과 방문한 맛집을 확인할 수 있습니다.
+          </p>
+
+          <div class="tabs">
+            <button class="tab active" id="tab-reserve" onclick="return go('reserve','reserve')">예약 목록</button>
+            <button class="tab" id="tab-visit" onclick="return go('visit','visit')">방문한 맛집</button>
+          </div>
+
+          <div class="panel" id="reserve">
+
+            <div class="r-item">
+              <div class="thumb">
+                <img src="{% static 'images/mypage/banner.png' %}" alt="">
+              </div>
+              <div>
+                <p class="r-title">파스타 리스토란테 트라토 포라토</p>
+                <div class="r-meta">2024년 5월 1일 오후 7:00, 2명</div>
+              </div>
+              <a class="r-btn" href="#">예약 취소</a>
+            </div>
+
+            <div class="r-item">
+              <div class="thumb">
+                <img src="{% static 'images/mypage/banner.png' %}" alt="">
+              </div>
+              <div>
+                <p class="r-title">한우팡가</p>
+                <div class="r-meta">2024년 5월 3일 오후 6:00, 4명</div>
+              </div>
+              <a class="r-btn" href="#">예약 취소</a>
+            </div>
+
+            <div class="section" id="visit">방문한 맛집</div>
+
+            <div class="v-grid">
+              <div class="v-card">
+                <div class="v-img"><img src="{% static 'images/mypage/banner.png' %}" alt=""></div>
+                <div class="v-body">
+                  <div class="v-title">스시도모</div>
+                  <div class="v-date">2024년 4월 12일</div>
+                  <div class="stars">★ 4.8 <small>(25.8개)</small></div>
+                </div>
+              </div>
+
+              <div class="v-card">
+                <div class="v-img"><img src="{% static 'images/mypage/banner.png' %}" alt=""></div>
+                <div class="v-body">
+                  <div class="v-title">봉구 스테이크하우스</div>
+                  <div class="v-date">2024년 3월 28일</div>
+                  <div class="stars">★ 4.6 <small>(86.3개)</small></div>
+                </div>
+              </div>
+
+              <div class="v-card">
+                <div class="v-img"><img src="{% static 'images/mypage/banner.png' %}" alt=""></div>
+                <div class="v-body">
+                  <div class="v-title">이태리오</div>
+                  <div class="v-date">2024년 3월 23일</div>
+                  <div class="stars">★ 4.7 <small>(12.1개)</small></div>
+                </div>
+              </div>
+
+              <div class="v-card">
+                <div class="v-img"><img src="{% static 'images/mypage/banner.png' %}" alt=""></div>
+                <div class="v-body">
+                  <div class="v-title">타타리오</div>
+                  <div class="v-date">2024년 3월 28일</div>
+                  <div class="stars">★ 4.5 <small>(18.0개)</small></div>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /panel -->
+
+        </div>
+      </main>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function setActive(which){
+    const links = document.querySelectorAll('.side-link');
+    links.forEach(a => a.classList.remove('active'));
+
+    if(which === 'reserve') links[1].classList.add('active');
+    else if(which === 'visit') links[2].classList.add('active');
+    else links[0].classList.add('active');
+
+    document.getElementById('tab-reserve').classList.toggle('active', which !== 'visit');
+    document.getElementById('tab-visit').classList.toggle('active', which === 'visit');
+  }
+
+  function go(id, which){
+    setActive(which);
+    const el = document.getElementById(id);
+    if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+    return false;
+  }
+
+  document.addEventListener('DOMContentLoaded', () => setActive('mypage'));
+</script>
+{% endblock %}

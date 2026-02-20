@@ -15,9 +15,12 @@
       --border:   #E8E3DA;
       --text:     #1A1714;
       --text2:    #6B6560;
-      --accent:   #D4622A;
-      --accent2:  #F0A07A;
-      --gold:     #E8A820;
+
+      /* ✅ 스샷 톤에 맞춘 포인트 컬러(톤다운 브라운 주황) */
+      --accent:   #B96B3A;   /* 기존 #D4622A -> 더 브라운/차분 */
+      --accent2:  #A85F33;   /* hover/보조 */
+
+      --gold:     #D8B56B;   /* 스샷 느낌 골드(기존보다 덜 쨍함) */
       --success:  #2E7D5A;
       --radius:   14px;
       --shadow:   0 2px 12px rgba(0,0,0,.06), 0 1px 3px rgba(0,0,0,.04);
@@ -31,6 +34,12 @@
       --border:   #333028;
       --text:     #F2EDE6;
       --text2:    #9A9389;
+
+      /* ✅ 다크에서도 포인트 동일 톤 유지 */
+      --accent:   #B96B3A;
+      --accent2:  #A85F33;
+      --gold:     #D8B56B;
+
       --shadow:   0 2px 12px rgba(0,0,0,.3), 0 1px 3px rgba(0,0,0,.2);
       --shadow-lg:0 8px 40px rgba(0,0,0,.5), 0 2px 8px rgba(0,0,0,.3);
     }
@@ -90,7 +99,7 @@
     .nav-links .btn-accent {
       background: var(--accent); color: #fff; padding: 8px 18px;
     }
-    .nav-links .btn-accent:hover { opacity: .88; color: #fff; }
+    .nav-links .btn-accent:hover { opacity: .90; color: #fff; }
 
     /* Theme toggle */
     .theme-toggle {
@@ -152,7 +161,7 @@
       transition: all var(--trans);
     }
     .btn-primary { background: var(--accent); color: #fff; }
-    .btn-primary:hover { opacity: .88; transform: translateY(-1px); }
+    .btn-primary:hover { opacity: .90; transform: translateY(-1px); }
     .btn-outline {
       border: 1.5px solid var(--border); color: var(--text2);
       background: var(--surface);
@@ -178,7 +187,7 @@
     .form-group textarea:focus,
     .form-group select:focus {
       border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(212,98,42,.12);
+      box-shadow: 0 0 0 3px rgba(185,107,58,.12);
       background: var(--surface);
     }
     .form-group textarea { resize: vertical; min-height: 120px; }
@@ -220,12 +229,26 @@
     <ul class="nav-links">
       <li><a href="/restaurants/">맛집 찾기</a></li>
       {% if user.is_authenticated %}
-        <li><a href="/favorites/">즐겨찾기</a></li>
-        <li><a href="/users/logout/">로그아웃</a></li>
-        <li><a href="#" class="btn-accent">{{ user.username }}</a></li>
+        <li>
+          <a href="/favorites/">즐겨찾기</a>
+        </li>
+        <li>
+          <a href="{% url 'mypage' %}" class="btn-accent">
+            {{ user.username }}
+          </a>
+        </li>
+        <li>
+          <a href="/users/logout/">로그아웃</a>
+        </li>
       {% else %}
-        <li><a href="/users/login/">로그인</a></li>
-        <li><a href="/users/signup/" class="btn-accent">시작하기</a></li>
+        <li>
+          <a href="/users/login/">로그인</a>
+        </li>
+        <li>
+          <a href="/users/signup/" class="btn-accent">
+            시작하기
+          </a>
+        </li>
       {% endif %}
       <li>
         <button class="theme-toggle" id="themeToggle" title="테마 변경">🌙</button>
